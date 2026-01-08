@@ -122,8 +122,9 @@ Il suffit ensuite de quitter cette interface.
 On peut redémarrer la RPi en tapant : `sudo reboot now`
 
 ### Installation à distance
-Le déploiement des programmes nécessaires se fait désormais à distance, depuis un PC (souvent le laptop Aquineuro) *via* un script qui s'appelle `deploy.py`.
+Le déploiement des programmes nécessaires se fait désormais à distance, depuis un PC (souvent le laptop Aquineuro) *via* un script qui s'appelle `deploy.py` auquel il faut fournir les identifiants de connexion.
 
 ```
-python deploy.py --do_all
+python deploy.py --host aqtion0000 --user aquineuro --password mot_de_passe --do_all
 ```
+
