@@ -119,7 +119,58 @@ Il faut ensuite remplir les champs comme sur cette capture d'écran. Les éléme
 :::
 Il suffit ensuite de quitter cette interface.
 
-On peut redémarrer la RPi en tapant : `sudo reboot now`
+### Activation de l'I2C
+On peut en profiter pour s'assurer que l'I2C est bien activé en utilisant `sudo raspi-config` et en suivant les quelques étapes ci-dessous :
+
+:::{figure} images/RPi_install/15.PNG
+:label: i2c_1
+
+Sélectionner le menu Interfaces et appuyer sur Entrée.
+:::
+
+:::{figure} images/RPi_install/16.PNG
+:label: i2c_2
+
+Dans ce menu, sélectionner I2C et appuer sur Entrée
+:::
+
+:::{figure} images/RPi_install/17.PNG
+:label: i2c_2
+
+Sélectionner **Yes** appuyer sur Entrée.
+:::
+
+### systemd - pigpiod
+Sur les versions récentes de Raspbian (basées sur Debian Trixie 13) le service qui lance le démon pigpio (qui est est responsable de la gestion des GPIOs) n'est plus créé automatiquement lors de l'installation. Il faut donc le faire manuellement. Pour cela il faut créer, en mode super utilisateur, un fichier dans `/etc/systemd/system` en tapant : 
+```bash
+sudo nano /etc/systemd/system/pigpiod.service
+```
+
+ce qui ouvre un éditeur de texte rudimentaire dans lequel on peut copier le contenu suivant : 
+```
+Description=Pigpio GPIO daemon
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/pigpiod
+ExecStop=/bin/systemctl kill pigpiod
+Type=forking
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Pour sauvegarder les changements on fait `Ctrl + O` et pour quitter `Ctrl + X`. Une fois sortis de nano, il faut activer ce nouveau service et vérifier que tout fonctionne bien :
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now pigpiod.service
+sudo systemctl restart pigpiod
+sudo systemctl status pigpiod
+```
+
+
+On peut, enfin, redémarrer la RPi en tapant : `sudo reboot now`
 
 ### Installation à distance
 Le déploiement des programmes nécessaires se fait désormais à distance, depuis un PC (souvent le laptop Aquineuro) *via* un script qui s'appelle `deploy.py` auquel il faut fournir les identifiants de connexion.
