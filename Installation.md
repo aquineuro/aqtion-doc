@@ -1,0 +1,129 @@
+---
+description: Installation des softwares
+label: installation
+date: 2026-01-05
+
+---
+# Installation
+(rpi-install)=
+## Préparation de la carte SD pour la RPi
+La première étape pour installer un système aqtion est de préparer une carte SD ([détails pour l'achat](https://aquineuro.synology.me/oo/r/13d7nrd8NygPOMaPGBaHmeTspGUbELm5#tid=1&range=7:7)) et d'y installer Raspbian Lite OS. La procédure est détaillée pas à pas dessous mais il faut commencer par insérer la carte SD dans l'ordinateur et s'assurer que [Raspberry Pi Imager](https://www.raspberrypi.com/software/) est installé. Ensuite, il faut suivre ces étapes : 
+
+### Choix du système d'exploitation
+:::{figure} images/RPi_install/01.PNG
+:label: step_01
+
+Nous utilisons des [Raspberry Pi 4](https://aquineuro.synology.me/oo/r/13d7nrd8NygPOMaPGBaHmeTspGUbELm5#tid=1&range=6:6). C'est donc ce modèle qu'il faut sélectionner
+:::
+
+:::{figure} images/RPi_install/02.PNG
+:label: step_02
+
+Pour installer la bonne version de l'OS il faut aller la chercher dans "Raspberry Pi OS (other)". On installe une version sans interface graphique !
+:::
+
+:::{figure} images/RPi_install/03.PNG
+:label: step_03
+
+On installe une version sans interface graphique : Le OS Lite (64 bit).
+:::
+
+:::{figure} images/RPi_install/04.PNG
+:label: step_04
+
+Il suffit de sélectionner la carte SD qui est sans doute le seul disque listé
+:::
+
+### Configuration
+On renseigne quelques éléments pour personnaliser l'installation :
+
+:::{figure} images/RPi_install/05.PNG
+:label: step_05
+
+Le nom du système. En général `aqtion????` avec 4 chiffres pour l'identification. Ces éléments sont à enregistrer dans le [fichier de suivi des systèmes aqtion](https://aquineuro.synology.me/oo/r/15zDkF3UgaFkCV93oI1MIz6crogwllNX) sur le NAS.
+:::
+
+:::{figure} images/RPi_install/06.PNG
+:label: step_06
+
+Le nom d'utilisateur est en général `aquineuro`. Le mot de passe doit être relativement simple à saisir, car nous serons amenés à l'utiliser plusieurs fois dans la suite de l'installation. Ces éléments sont à enregistrer dans le [fichier de suivi des systèmes aqtion](https://aquineuro.synology.me/oo/r/15zDkF3UgaFkCV93oI1MIz6crogwllNX) sur le NAS.
+:::
+
+:::{figure} images/RPi_install/07.PNG
+:label: step_07
+
+Inutile de configurer le WIFi.
+:::
+
+:::{figure} images/RPi_install/08.PNG
+:label: step_08
+
+Il est indispensable d'activer le SSH et de laisser l'authentification par mot de passe. C'est ce mécanisme que nous allons utiliser pour finaliser l'installation d'aqtion.
+:::
+
+:::{figure} images/RPi_install/09.PNG
+:label: step_09
+
+Inutile de l'activer
+:::
+
+:::{figure} images/RPi_install/10.PNG
+:label: step_10
+
+Nous sommes fin prêts à lancer l'installation en cliquant sur "Écrire". Pour s'assurer que nous sommes conscients de ce qu'il va se passer il y a un petit minuteur de quelques secondes au bout du quel le bouton pour lancer l'écriture est activé. Il faut donc patienter.
+:::
+
+:::{figure} images/RPi_install/11.PNG
+:label: step_11
+
+Nous sommes fin prêts à lancer l'installation en cliquant sur "Je comprends, effacer et écrire". Pour s'assurer que nous sommes conscients de ce qu'il va se passer il y a un petit minuteur de quelques secondes au bout du quel le bouton pour lancer l'écriture est activé. Il faut donc patienter.
+:::
+
+Une fois l'écriture sur la carte SD terminée, elle est automatiquement éjectée. On peut donc la récupérer et la placer dans une RPi.
+
+### Sauvegarde des identifiants
+Il est **très important** de copier les identifiants (nom d'utilisateur et mot de passe) dans le [fichier de suivi des systèmes aqtion](https://aquineuro.synology.me/oo/r/15zDkF3UgaFkCV93oI1MIz6crogwllNX) sur le NAS.
+
+(aqtion-install)=
+## Déploiement du code aqtion
+Une fois que la carte SD est dans une RPi il faut y mettre le code aqtion. Pour cela il faut pouvoir y accéder depuis le réseau, en [SSH](https://en.wikipedia.org/wiki/Secure_Shell). Pour cela, si l'installation se fait à l'INCIA il faut attribuer une IP fixe à cette RPi.
+
+### Préliminaire à l'INCIA : IP fixe
+Pour se faire il faut brancher un clavier (USB) et un écran (*via* un câble miniHDMI - HDMI) à la RPi.  Une fois que clavier et écran sont branchés il faut allumer la RPi, et se logguer. Ensuite, saisir la ligne suivante : 
+```bash
+sudo nmtui
+```
+qui lance l'interface du *Network Manager* (Network Manager Terminal User Interface - nmtui). Une commande commençant par `sudo` permet d'exécuter ce qui suit en mode "administrateur" ce qui veut dire que le mot de passe peut être demandé. 
+Il faut ensuite suivre les quelques étapes ci-dessous pour configurer la RPi pour qu'elle puisse être reconnue sur le réseau de l'INCIA. On se déplace dans l'interface en utilisant les flèches du clavier ainsi que les touches tabulation et entrée.
+
+:::{figure} images/RPi_install/12.PNG
+:label: nmtui_01
+
+Choisir "Edit a connection"
+:::
+
+:::{figure} images/RPi_install/13.PNG
+:label: nmtui_02
+
+"Edit ..." sur la connexion Ethernet
+:::
+
+:::{figure} images/RPi_install/14.PNG
+:label: nmtui_03
+
+Il faut ensuite remplir les champs comme sur cette capture d'écran. Les éléments importants : 
+* IPv4 configuration: Manual 
+* Addresses: 172.22.0.20/24
+* Gateway: 172.22.0.30
+* DNS servers: 109.0.66.11
+:::
+Il suffit ensuite de quitter cette interface.
+
+On peut redémarrer la RPi en tapant : `sudo reboot now`
+
+### Installation à distance
+Le déploiement des programmes nécessaires se fait désormais à distance, depuis un PC (souvent le laptop Aquineuro) *via* un script qui s'appelle `deploy.py`.
+
+```
+python deploy.py --do_all
+```
