@@ -81,14 +81,20 @@ Nous sommes fin prêts à lancer l'installation en cliquant sur "Je comprends, e
 
 Une fois l'écriture sur la carte SD terminée, elle est automatiquement éjectée. On peut donc la récupérer et la placer dans une RPi.
 
-### Sauvegarde des identifiants
+:::{important}
 Il est **très important** de copier les identifiants (nom d'utilisateur et mot de passe) dans le [fichier de suivi des systèmes aqtion](https://aquineuro.synology.me/oo/r/15zDkF3UgaFkCV93oI1MIz6crogwllNX) sur le NAS.
+:::
 
 (aqtion-install)=
 ## Déploiement du code aqtion
 Une fois que la carte SD est dans une RPi il faut y mettre le code aqtion. Pour cela il faut pouvoir y accéder depuis le réseau, en [SSH](https://en.wikipedia.org/wiki/Secure_Shell). Pour cela, si l'installation se fait à l'INCIA il faut attribuer une IP fixe à cette RPi.
 
+(ip-fixe)=
 ### Préliminaire à l'INCIA : IP fixe
+:::{tip}
+Ceci n'est à faire que si l'installation s'effectue à l'INCIA, qui nous oblige à avoir des IP fixes
+:::
+
 Pour se faire il faut brancher un clavier (USB) et un écran (*via* un câble miniHDMI - HDMI) à la RPi.  Une fois que clavier et écran sont branchés il faut allumer la RPi, et se logguer. Ensuite, saisir la ligne suivante : 
 ```bash
 sudo nmtui
@@ -119,8 +125,15 @@ Il faut ensuite remplir les champs comme sur cette capture d'écran. Les éléme
 :::
 Il suffit ensuite de quitter cette interface.
 
+On peut ensuite redémarrer la RPi en tapant `sudo shutdown now`
+
+:::{tip}
+Une fois que l'IP a été configurée, tout peut se faire à distance, sans écran ni clavier, seule la connexion réseau est nécessaire. Depuis un ordinateur windows il faut lancer le powershell et taper `ssh aquineuro@aqtion0000`. Répondre `yes` à la question sur l'authenticité.
+:::
+
 ### Activation de l'I2C
-On peut en profiter pour s'assurer que l'I2C est bien activé en utilisant `sudo raspi-config` et en suivant les quelques étapes ci-dessous :
+
+On peut en profiter pour s'assurer que l'I2C est bien activé, et l'activer le cas échéant, en utilisant `sudo raspi-config` et en suivant les quelques étapes ci-dessous :
 
 :::{figure} images/RPi_install/15.PNG
 :label: i2c_1
@@ -135,10 +148,19 @@ Dans ce menu, sélectionner I2C et appuer sur Entrée
 :::
 
 :::{figure} images/RPi_install/17.PNG
-:label: i2c_2
+:label: i2c_3
 
 Sélectionner **Yes** appuyer sur Entrée.
 :::
+
+
+### Installation à distance
+Le déploiement des programmes nécessaires se fait désormais à distance, depuis un PC (souvent le laptop Aquineuro) *via* un script qui s'appelle `deploy.py` auquel il faut fournir les identifiants de connexion.
+
+```
+python deploy.py --host aqtion0000 --user aquineuro --password mot_de_passe --do_all
+```
+
 
 ### systemd - pigpiod
 Sur les versions récentes de Raspbian (basées sur Debian Trixie 13) le service qui lance le démon pigpio (qui est est responsable de la gestion des GPIOs) n'est plus créé automatiquement lors de l'installation. Il faut donc le faire manuellement. Pour cela il faut créer, en mode super utilisateur, un fichier dans `/etc/systemd/system` en tapant : 
@@ -161,7 +183,7 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
-Pour sauvegarder les changements on fait `Ctrl + O` et pour quitter `Ctrl + X`. Une fois sortis de nano, il faut activer ce nouveau service et vérifier que tout fonctionne bien :
+Pour sauvegarder les changements on fait `Ctrl + O`  et `Entrée` ensuite pour quitter `Ctrl + X`. Une fois sortis de nano, il faut activer ce nouveau service et vérifier que tout fonctionne bien :
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable --now pigpiod.service
@@ -172,10 +194,9 @@ sudo systemctl status pigpiod
 
 On peut, enfin, redémarrer la RPi en tapant : `sudo reboot now`
 
-### Installation à distance
-Le déploiement des programmes nécessaires se fait désormais à distance, depuis un PC (souvent le laptop Aquineuro) *via* un script qui s'appelle `deploy.py` auquel il faut fournir les identifiants de connexion.
+### Configuration
+Il faut générer un fichier de configuration (`default_config.json`) qui fait le lien entre les pins de la RPi et les entrées / sorties effectivement branchées sur le système, et qui leur attribue des nom
 
-```
-python deploy.py --host aqtion0000 --user aquineuro --password mot_de_passe --do_all
-```
-
+### Passage en DHCP
+Une fois toute l'installation terminée il faut repasser la configuration réseau en DHCP pour que l'ordinateur du setup puisse lui atttribuer une IP. Pour cela, une fois connecté en SSH, répéter les étapes [1](#nmtui_01) et [2](#nmtui_01) du paragraphe sur [l'IP fixe.](#ip-fixe)
+Cette fois l'IPv4 configuration doit être placée sur Automatic.  Les champs `Adresses` et `Gateway` doivent être vides (utiliser `Remove`). Le `DNS server` doit contenir l'IP du PC sur lequel sera installé le client. Par exemple pour le portable Aquineuro il s'agit de `192.168.1.1`.	
