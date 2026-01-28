@@ -1,10 +1,10 @@
 ---
-description: Installation des softwares
+description: Installation des softwares sur RPi
 label: installation
 date: 2026-01-05
 
 ---
-# Installation
+# Installation de la carte base
 (rpi-install)=
 ## Préparation de la carte SD pour la RPi
 La première étape pour installer un système aqtion est de préparer une carte SD ([détails pour l'achat](https://aquineuro.synology.me/oo/r/13d7nrd8NygPOMaPGBaHmeTspGUbELm5#tid=1&range=7:7)) et d'y installer Raspbian Lite OS. La procédure est détaillée pas à pas dessous mais il faut commencer par insérer la carte SD dans l'ordinateur et s'assurer que [Raspberry Pi Imager](https://www.raspberrypi.com/software/) est installé. Ensuite, il faut suivre ces étapes : 
@@ -197,6 +197,7 @@ On peut, enfin, redémarrer la RPi en tapant : `sudo reboot now`
 ### Configuration
 Il faut générer un fichier de configuration (`default_config.json`) qui fait le lien entre les pins de la RPi et les entrées / sorties effectivement branchées sur le système, et qui leur attribue des nom
 
+(dhcp-rpi)=
 ### Passage en DHCP
 Une fois toute l'installation terminée il faut repasser la configuration réseau en DHCP pour que l'ordinateur du setup puisse lui atttribuer une IP. Pour cela, une fois connecté en SSH, répéter les étapes [1](#nmtui_01) et [2](#nmtui_01) du paragraphe sur [l'IP fixe.](#ip-fixe)
 Cette fois l'IPv4 configuration doit être placée sur Automatic.  Les champs `Adresses` et `Gateway` doivent être vides (utiliser `Remove`). Le `DNS server` doit contenir l'IP du PC sur lequel sera installé le client. Par exemple pour le portable Aquineuro il s'agit de `192.168.1.1`.	
