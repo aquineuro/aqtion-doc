@@ -31,6 +31,7 @@ project:
     - file: root.md
     - file: Installation.md
     - file: install_client.md
+    - file: install_video.md
     - title: Modules
       children:
         - file: modules/reward.md
